@@ -2,7 +2,8 @@ package repository
 
 import (
 	models "github.com/Njrctr/javacode_test_golang_junior/models"
-	pg_rep "github.com/Njrctr/javacode_test_golang_junior/repository/postgres"
+	pg_rep "github.com/Njrctr/javacode_test_golang_junior/pkg/repository/postgres"
+	"github.com/gofrs/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -12,11 +13,11 @@ type Autorization interface {
 }
 
 type Wallet interface {
-	Create(userId int) (int, error)
+	Create(userId int) (uuid.UUID, error)
 	GetAll(userId int) ([]models.Wallet, error)
-	GetById(userId, listId int) (models.Wallet, error)
-	Delete(userId, listId int) error
-	Update(userId, walletId int, input models.WalletUpdate) error
+	GetByUUID(walletId uuid.UUID) (models.Wallet, error)
+	Delete(walletId uuid.UUID) error
+	Update(input models.WalletUpdate) error
 }
 
 type Repository struct {
@@ -26,7 +27,7 @@ type Repository struct {
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
-		Autorization: pg_rep.NewAuthRepository(db),
-		Wallet:       pg_rep.NewWalletRepository(db),
+		Autorization: pg_rep.NewAuthPostgres(db),
+		Wallet:       pg_rep.NewWalletPostgres(db),
 	}
 }

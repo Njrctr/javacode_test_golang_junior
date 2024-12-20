@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	models "github.com/Njrctr/restapi-todo/models"
+	models "github.com/Njrctr/javacode_test_golang_junior/models"
 	"github.com/gin-gonic/gin"
 )
 

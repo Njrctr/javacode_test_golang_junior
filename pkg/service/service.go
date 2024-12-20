@@ -3,6 +3,7 @@ package service
 import (
 	models "github.com/Njrctr/javacode_test_golang_junior/models"
 	"github.com/Njrctr/javacode_test_golang_junior/pkg/repository"
+	"github.com/gofrs/uuid"
 )
 
 //go:generate mockgen -source=service.go -destination=mock/mock.go
@@ -14,8 +15,11 @@ type Autorization interface {
 }
 
 type Wallet interface {
-	Create(models.Wallet) (int, error)
-	Update(valletId int, operationType string, amount int) error
+	Create(userId int) (uuid.UUID, error)
+	GetAll(userId int) ([]models.Wallet, error)
+	GetById(walletId uuid.UUID) (models.Wallet, error)
+	Update(input models.WalletUpdate) error
+	Delete(walletId uuid.UUID) error
 }
 
 type Service struct {

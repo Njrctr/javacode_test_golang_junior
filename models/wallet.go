@@ -1,10 +1,13 @@
 package models
 
+import "github.com/gofrs/uuid"
+
 type Wallet struct {
+	Id int `json:"-" db:"id"`
 }
 
 type WalletUpdate struct {
-	ValletId      int
-	OperationType string // DEPOSIT or WITHDRAW
-	Amount        int
+	WalletUUID    uuid.UUID `json:"wallet_id" binding:"required"`
+	OperationType string    `json:"operation_type" binding:"required"` // DEPOSIT or WITHDRAW
+	Amount        int       `json:"amount" binding:"required"`
 }
