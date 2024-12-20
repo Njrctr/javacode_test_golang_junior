@@ -8,19 +8,18 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-// @Summary Create todo list
+// @Summary Create todo Wallet
 // @Security ApiKeyAuth
-// @Tags lists
-// @Description create todo list
-// @ID create-list
+// @Tags Wallets
+// @Description create wallet
+// @ID create-wallet
 // @Accept  json
 // @Produce  json
-// @Param input body models.TodoListCreateUpdate true "list info"
-// @Success 200 {integer} integer 1
+// @Success 200 {uuid} uuid 1
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/lists [post]
+// @Router /api/v1/wallet/new [post]
 func (h *Handler) createWallet(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
@@ -42,18 +41,18 @@ type getAllWalletsResponce struct {
 	Data []models.Wallet `json:"data"`
 }
 
-// @Summary Get All Lists
+// @Summary Get All Wallets
 // @Security ApiKeyAuth
-// @Tags lists
-// @Description get all lists
-// @ID get-all-lists
+// @Tags wallets
+// @Description get all wallets
+// @ID get-all-wallets
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} getAllListsResponce
+// @Success 200 {object} getAllWalletsResponce
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/lists [get]
+// @Router /api/v1/wallet [get]
 func (h *Handler) getAllWallets(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {
@@ -71,24 +70,24 @@ func (h *Handler) getAllWallets(c *gin.Context) {
 	})
 }
 
-// @Summary Get List By Id
+// @Summary Get Wallet By UUID
 // @Security ApiKeyAuth
-// @Tags lists
-// @Description get list by id
-// @ID get-list-by-id
+// @Tags wallets
+// @Description get wallet by uuid
+// @ID get-wallet-by-uuid
 // @Accept  json
 // @Produce  json
-// @Param list_id path int true "List Id"
-// @Success 200 {object} models.TodoList
+// @Param wallet_uuid path int true "Wallet uuid"
+// @Success 200 {object} models.Wallet
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/lists/{list_id} [get]
+// @Router /api/v1/wallets/{wallet_uuid} [get]
 func (h *Handler) getWalletById(c *gin.Context) {
 
-	walletId, err := uuid.FromString(c.Param("list_id"))
+	walletId, err := uuid.FromString(c.Param("wallet_uuid"))
 	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "Invalid list_id param")
+		newErrorResponse(c, http.StatusBadRequest, "Invalid wallet_uuid param")
 		return
 	}
 
@@ -101,20 +100,19 @@ func (h *Handler) getWalletById(c *gin.Context) {
 	c.JSON(http.StatusOK, wallet)
 }
 
-// @Summary Update todo List
+// @Summary Update Wallet
 // @Security ApiKeyAuth
-// @Tags lists
-// @Description update todo list
-// @ID update-list
+// @Tags wallets
+// @Description update wallet
+// @ID update-wallet
 // @Accept  json
 // @Produce  json
-// @Param list_id path int true "List Id"
-// @Param input body models.TodoListCreateUpdate true "list info"
+// @Param input body models.WalletUpdate true "Wallet query"
 // @Success 200 {integer} integer 1
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/lists/{list_id} [put]
+// @Router /api/v1/wallet [post]
 func (h *Handler) updateWallet(c *gin.Context) {
 
 	var input models.WalletUpdate
@@ -131,19 +129,19 @@ func (h *Handler) updateWallet(c *gin.Context) {
 	c.JSON(http.StatusOK, statusResponce{"ok"})
 }
 
-// @Summary Delete List
+// @Summary Delete Wallet
 // @Security ApiKeyAuth
-// @Tags lists
-// @Description delete list
-// @ID delete-list
+// @Tags wallets
+// @Description delete wallet
+// @ID delete-wallet
 // @Accept  json
 // @Produce  json
-// @Param list_id path int true "List Id"
+// @Param wallet_uuid path int true "Wallet UUID"
 // @Success 200 {string} string ok
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/lists/{list_id} [delete]
+// @Router /api/v1/wallet/{wallet_uuid} [delete]
 func (h *Handler) deleteWallet(c *gin.Context) {
 
 	walletId, err := uuid.FromString(c.Param("wallet_uuid"))

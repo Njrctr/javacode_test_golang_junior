@@ -1,11 +1,11 @@
 package handler
 
 import (
+	_ "github.com/Njrctr/javacode_test_golang_junior/docs"
 	"github.com/Njrctr/javacode_test_golang_junior/pkg/service"
 	"github.com/gin-gonic/gin"
-	// _ "github.com/Njrctr/javacode_test_golang_junior/docs"
-	// swaggerFiles "github.com/swaggo/files"
-	// ginSwagger "github.com/swaggo/gin-swagger"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Handler struct {
@@ -19,7 +19,7 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRouters() *gin.Engine {
 	router := gin.New()
 
-	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	auth := router.Group("/auth")
 	{
@@ -34,6 +34,9 @@ func (h *Handler) InitRouters() *gin.Engine {
 			wallet := v1.Group("/wallet")
 			{
 				wallet.POST("/", h.updateWallet)
+				wallet.POST("/new", h.createWallet)
+				wallet.GET("/", h.getAllWallets)
+				wallet.DELETE("/", h.deleteWallet)
 			}
 
 			wallets := v1.Group("/wallets")
