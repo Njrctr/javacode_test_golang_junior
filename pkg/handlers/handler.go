@@ -27,7 +27,7 @@ func (h *Handler) InitRouters() *gin.Engine {
 		auth.POST("/sign-in", h.signIn)
 	}
 
-	api := router.Group("/api")
+	api := router.Group("/api", h.userIdentify)
 	{
 		v1 := api.Group("/v1")
 		{
@@ -36,12 +36,12 @@ func (h *Handler) InitRouters() *gin.Engine {
 				wallet.POST("/", h.updateWallet)
 				wallet.POST("/new", h.createWallet)
 				wallet.GET("/", h.getAllWallets)
-				wallet.DELETE("/", h.deleteWallet)
+				wallet.DELETE("/:wallet_uuid", h.deleteWallet)
 			}
 
 			wallets := v1.Group("/wallets")
 			{
-				wallets.GET("/:wallet_uuid", h.getWalletById)
+				wallets.GET("/:wallet_uuid", h.GetBalanceByUUID)
 			}
 
 		}

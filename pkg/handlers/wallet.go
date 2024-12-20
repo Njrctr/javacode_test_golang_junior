@@ -8,7 +8,7 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-// @Summary Create todo Wallet
+// @Summary Create Wallet
 // @Security ApiKeyAuth
 // @Tags Wallets
 // @Description create wallet
@@ -43,7 +43,7 @@ type getAllWalletsResponce struct {
 
 // @Summary Get All Wallets
 // @Security ApiKeyAuth
-// @Tags wallets
+// @Tags Wallets
 // @Description get all wallets
 // @ID get-all-wallets
 // @Accept  json
@@ -72,12 +72,12 @@ func (h *Handler) getAllWallets(c *gin.Context) {
 
 // @Summary Get Wallet By UUID
 // @Security ApiKeyAuth
-// @Tags wallets
+// @Tags Wallets
 // @Description get wallet by uuid
 // @ID get-wallet-by-uuid
 // @Accept  json
 // @Produce  json
-// @Param wallet_uuid path int true "Wallet uuid"
+// @Param wallet_uuid path string true "Wallet uuid"
 // @Success 200 {object} models.Wallet
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
@@ -91,7 +91,7 @@ func (h *Handler) getWalletById(c *gin.Context) {
 		return
 	}
 
-	wallet, err := h.services.Wallet.GetById(walletId)
+	wallet, err := h.services.Wallet.GetByUUID(walletId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -100,9 +100,26 @@ func (h *Handler) getWalletById(c *gin.Context) {
 	c.JSON(http.StatusOK, wallet)
 }
 
+func (h *Handler) GetBalanceByUUID(c *gin.Context) {
+
+	walletId, err := uuid.FromString(c.Param("wallet_uuid"))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "Invalid wallet_uuid param")
+		return
+	}
+
+	walletBalance, err := h.services.Wallet.GetBalanceByUUID(walletId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, walletBalance)
+}
+
 // @Summary Update Wallet
 // @Security ApiKeyAuth
-// @Tags wallets
+// @Tags Wallets
 // @Description update wallet
 // @ID update-wallet
 // @Accept  json
@@ -131,12 +148,12 @@ func (h *Handler) updateWallet(c *gin.Context) {
 
 // @Summary Delete Wallet
 // @Security ApiKeyAuth
-// @Tags wallets
+// @Tags Wallets
 // @Description delete wallet
 // @ID delete-wallet
 // @Accept  json
 // @Produce  json
-// @Param wallet_uuid path int true "Wallet UUID"
+// @Param wallet_uuid path string true "Wallet UUID"
 // @Success 200 {string} string ok
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse

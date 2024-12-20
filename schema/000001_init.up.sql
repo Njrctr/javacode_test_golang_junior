@@ -9,13 +9,15 @@ CREATE TABLE users
 CREATE TABLE wallets
 (
     id            serial       not null unique,
-    uuid          UUID      not null unique,
-    balance  int   CHECK (balance >= 0)
+    uuid          uuid      DEFAULT gen_random_uuid(),
+    balance  int   CHECK (balance >= 0) DEFAULT 0
 );
 
 CREATE TABLE users_wallets
 (
     id      serial                                           not null unique,
     user_id int references users (id) on delete cascade      not null,
-    wallets_id int references wallets (id) on delete cascade not null
+    wallet_id int references wallets (id) on delete cascade not null
 );
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

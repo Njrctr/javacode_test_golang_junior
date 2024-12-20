@@ -1,8 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "API Server for TodoApp Application",
-        "title": "Todo App API",
+        "description": "API Server for Wallet",
+        "title": "Wallet API",
         "contact": {},
         "version": "1.0"
     },
@@ -24,7 +24,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "wallets"
+                    "Wallets"
                 ],
                 "summary": "Get All Wallets",
                 "operationId": "get-all-wallets",
@@ -75,7 +75,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "wallets"
+                    "Wallets"
                 ],
                 "summary": "Update Wallet",
                 "operationId": "update-wallet",
@@ -141,7 +141,7 @@
                 "tags": [
                     "Wallets"
                 ],
-                "summary": "Create todo Wallet",
+                "summary": "Create Wallet",
                 "operationId": "create-wallet",
                 "responses": {
                     "200": {
@@ -192,13 +192,13 @@
                     "application/json"
                 ],
                 "tags": [
-                    "wallets"
+                    "Wallets"
                 ],
                 "summary": "Delete Wallet",
                 "operationId": "delete-wallet",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Wallet UUID",
                         "name": "wallet_uuid",
                         "in": "path",
@@ -254,13 +254,13 @@
                     "application/json"
                 ],
                 "tags": [
-                    "wallets"
+                    "Wallets"
                 ],
                 "summary": "Get Wallet By UUID",
                 "operationId": "get-wallet-by-uuid",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Wallet uuid",
                         "name": "wallet_uuid",
                         "in": "path",
@@ -311,7 +311,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "SignIn",
                 "operationId": "login",
@@ -370,7 +370,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "SignUp",
                 "operationId": "create-account",
@@ -475,24 +475,32 @@
             }
         },
         "models.Wallet": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "integer"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
         },
         "models.WalletUpdate": {
             "type": "object",
             "required": [
                 "amount",
-                "operation_type",
-                "wallet_id"
+                "operationType",
+                "walletId"
             ],
             "properties": {
                 "amount": {
                     "type": "integer"
                 },
-                "operation_type": {
+                "operationType": {
                     "description": "DEPOSIT or WITHDRAW",
                     "type": "string"
                 },
-                "wallet_id": {
+                "walletId": {
                     "type": "string"
                 }
             }

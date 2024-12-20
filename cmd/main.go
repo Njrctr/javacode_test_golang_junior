@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	todo "github.com/Njrctr/javacode_test_golang_junior/models"
+	models "github.com/Njrctr/javacode_test_golang_junior/models"
 	handler "github.com/Njrctr/javacode_test_golang_junior/pkg/handlers"
 	"github.com/Njrctr/javacode_test_golang_junior/pkg/repository"
 	pg_rep "github.com/Njrctr/javacode_test_golang_junior/pkg/repository/postgres"
@@ -17,9 +17,9 @@ import (
 	"github.com/spf13/viper"
 )
 
-// @title Todo App API
+// @title Wallet API
 // @version 1.0
-// @description API Server for TodoApp Application
+// @description API Server for Wallet
 
 // @host localhost:8080
 // @BasePath /
@@ -51,7 +51,7 @@ func main() {
 	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
-	server := new(todo.Server)
+	server := new(models.Server)
 	logrus.Printf("Попытка запуска сервера на порту %s", viper.GetString("port"))
 
 	go func() {
@@ -59,12 +59,12 @@ func main() {
 			logrus.Fatalf("Error occured while running http server: %s", err.Error())
 		}
 	}()
-	logrus.Print("TODO App Started")
+	logrus.Print("Walletter APP Started")
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
 	<-quit
-	logrus.Print("TODO App Stoped")
+	logrus.Print("Walletter App Stoped")
 	if err := server.Shutdown(context.Background()); err != nil {
 		logrus.Errorf("error occured on server shutting down: %s", err.Error())
 	}

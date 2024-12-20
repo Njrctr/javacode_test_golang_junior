@@ -16,6 +16,7 @@ type Wallet interface {
 	Create(userId int) (uuid.UUID, error)
 	GetAll(userId int) ([]models.Wallet, error)
 	GetByUUID(walletId uuid.UUID) (models.Wallet, error)
+	GetBalanceByUUID(walletId uuid.UUID) (int, error)
 	Delete(walletId uuid.UUID) error
 	Update(input models.WalletUpdate) error
 }

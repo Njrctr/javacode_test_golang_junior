@@ -22,7 +22,13 @@ func (s *WalletService) GetAll(userId int) ([]models.Wallet, error) {
 	return s.repo.GetAll(userId)
 }
 
-func (s *WalletService) GetById(walletId uuid.UUID) (models.Wallet, error)
+func (s *WalletService) GetByUUID(walletId uuid.UUID) (models.Wallet, error) {
+	return s.repo.GetByUUID(walletId)
+}
+
+func (s *WalletService) GetBalanceByUUID(walletId uuid.UUID) (int, error) {
+	return s.repo.GetBalanceByUUID(walletId)
+}
 
 func (s *WalletService) Delete(walletId uuid.UUID) error {
 	return s.repo.Delete(walletId)

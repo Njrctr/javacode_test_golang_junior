@@ -30,7 +30,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "wallets"
+                    "Wallets"
                 ],
                 "summary": "Get All Wallets",
                 "operationId": "get-all-wallets",
@@ -81,7 +81,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "wallets"
+                    "Wallets"
                 ],
                 "summary": "Update Wallet",
                 "operationId": "update-wallet",
@@ -147,7 +147,7 @@ const docTemplate = `{
                 "tags": [
                     "Wallets"
                 ],
-                "summary": "Create todo Wallet",
+                "summary": "Create Wallet",
                 "operationId": "create-wallet",
                 "responses": {
                     "200": {
@@ -198,13 +198,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "wallets"
+                    "Wallets"
                 ],
                 "summary": "Delete Wallet",
                 "operationId": "delete-wallet",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Wallet UUID",
                         "name": "wallet_uuid",
                         "in": "path",
@@ -260,13 +260,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "wallets"
+                    "Wallets"
                 ],
                 "summary": "Get Wallet By UUID",
                 "operationId": "get-wallet-by-uuid",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Wallet uuid",
                         "name": "wallet_uuid",
                         "in": "path",
@@ -317,7 +317,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "SignIn",
                 "operationId": "login",
@@ -376,7 +376,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "SignUp",
                 "operationId": "create-account",
@@ -481,24 +481,32 @@ const docTemplate = `{
             }
         },
         "models.Wallet": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "integer"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
         },
         "models.WalletUpdate": {
             "type": "object",
             "required": [
                 "amount",
-                "operation_type",
-                "wallet_id"
+                "operationType",
+                "walletId"
             ],
             "properties": {
                 "amount": {
                     "type": "integer"
                 },
-                "operation_type": {
+                "operationType": {
                     "description": "DEPOSIT or WITHDRAW",
                     "type": "string"
                 },
-                "wallet_id": {
+                "walletId": {
                     "type": "string"
                 }
             }
@@ -519,12 +527,10 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "Todo App API",
-	Description:      "API Server for TodoApp Application",
+	Title:            "Wallet API",
+	Description:      "API Server for Wallet",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
-	LeftDelim:        "{{",
-	RightDelim:       "}}",
 }
 
 func init() {

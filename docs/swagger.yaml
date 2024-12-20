@@ -36,26 +36,31 @@ definitions:
     - username
     type: object
   models.Wallet:
+    properties:
+      balance:
+        type: integer
+      uuid:
+        type: string
     type: object
   models.WalletUpdate:
     properties:
       amount:
         type: integer
-      operation_type:
+      operationType:
         description: DEPOSIT or WITHDRAW
         type: string
-      wallet_id:
+      walletId:
         type: string
     required:
     - amount
-    - operation_type
-    - wallet_id
+    - operationType
+    - walletId
     type: object
 host: localhost:8080
 info:
   contact: {}
-  description: API Server for TodoApp Application
-  title: Todo App API
+  description: API Server for Wallet
+  title: Wallet API
   version: "1.0"
 paths:
   /api/v1/wallet:
@@ -91,7 +96,7 @@ paths:
       - ApiKeyAuth: []
       summary: Get All Wallets
       tags:
-      - wallets
+      - Wallets
     post:
       consumes:
       - application/json
@@ -131,7 +136,7 @@ paths:
       - ApiKeyAuth: []
       summary: Update Wallet
       tags:
-      - wallets
+      - Wallets
   /api/v1/wallet/{wallet_uuid}:
     delete:
       consumes:
@@ -143,7 +148,7 @@ paths:
         in: path
         name: wallet_uuid
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -171,7 +176,7 @@ paths:
       - ApiKeyAuth: []
       summary: Delete Wallet
       tags:
-      - wallets
+      - Wallets
   /api/v1/wallet/new:
     post:
       consumes:
@@ -203,7 +208,7 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Create todo Wallet
+      summary: Create Wallet
       tags:
       - Wallets
   /api/v1/wallets/{wallet_uuid}:
@@ -217,7 +222,7 @@ paths:
         in: path
         name: wallet_uuid
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -245,7 +250,7 @@ paths:
       - ApiKeyAuth: []
       summary: Get Wallet By UUID
       tags:
-      - wallets
+      - Wallets
   /auth/sign-in:
     post:
       consumes:
@@ -284,7 +289,7 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
       summary: SignIn
       tags:
-      - auth
+      - Auth
   /auth/sign-up:
     post:
       consumes:
@@ -323,7 +328,7 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
       summary: SignUp
       tags:
-      - auth
+      - Auth
 securityDefinitions:
   ApiKeyAuth:
     in: header

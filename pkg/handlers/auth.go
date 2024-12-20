@@ -8,7 +8,7 @@ import (
 )
 
 // @Summary SignUp
-// @Tags auth
+// @Tags Auth
 // @Description create account
 // @ID create-account
 // @Accept  json
@@ -43,7 +43,7 @@ type signInInput struct {
 }
 
 // @Summary SignIn
-// @Tags auth
+// @Tags Auth
 // @Description login
 // @ID login
 // @Accept  json
