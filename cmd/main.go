@@ -74,7 +74,7 @@ func main() {
 }
 
 func initConfig() (map[string]string, error) {
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load("config.env"); err != nil {
 		logrus.Fatalf("Ошибка получения переменных окружения: %s", err.Error())
 	}
 
