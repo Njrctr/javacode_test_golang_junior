@@ -22,16 +22,16 @@ func (s *WalletService) GetAll(userId int) ([]models.Wallet, error) {
 	return s.repo.GetAll(userId)
 }
 
-func (s *WalletService) GetByUUID(walletId uuid.UUID) (models.Wallet, error) {
-	return s.repo.GetByUUID(walletId)
+func (s *WalletService) GetByUUID(walletUUID uuid.UUID) (models.Wallet, error) {
+	return s.repo.GetByUUID(walletUUID)
 }
 
-func (s *WalletService) GetBalanceByUUID(walletId uuid.UUID) (int, error) {
-	return s.repo.GetBalanceByUUID(walletId)
+func (s *WalletService) GetBalanceByUUID(walletUUID uuid.UUID) (int, error) {
+	return s.repo.GetBalanceByUUID(walletUUID)
 }
 
-func (s *WalletService) Delete(walletId uuid.UUID) error {
-	return s.repo.Delete(walletId)
+func (s *WalletService) Delete(userId int, walletUUID uuid.UUID) error {
+	return s.repo.Delete(userId, walletUUID)
 }
 
 func (s *WalletService) Update(input models.WalletUpdate) error {
