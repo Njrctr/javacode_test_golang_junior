@@ -1,8 +1,8 @@
 build:
-	docker-compose build wallet-backend
+	docker-compose build walletter-backend
 
 run:
-	docker-compose up wallet-backend --force-recreate
+	docker-compose up walletter-backend --force-recreate
 
 test:
 	go test -v ./...
@@ -15,3 +15,6 @@ migrate_down:
 
 swag:
 	swag init -g cmd/main.go
+
+database:
+	sudo docker run --name=todo-db -e POSTGRES_PASSWORD='qwerty' -p 5436:5432 -d --rm postgres

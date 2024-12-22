@@ -5,6 +5,13 @@ definitions:
       message:
         type: string
     type: object
+  handler.getAllWalletsAdminResponce:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Wallet'
+        type: array
+    type: object
   handler.getAllWalletsResponce:
     properties:
       data:
@@ -21,6 +28,15 @@ definitions:
     required:
     - email
     - password
+    type: object
+  models.BlockWallet:
+    properties:
+      block:
+        type: boolean
+      walletUUID:
+        type: string
+    required:
+    - block
     type: object
   models.User:
     properties:
@@ -39,6 +55,8 @@ definitions:
     properties:
       balance:
         type: integer
+      blocked:
+        type: boolean
       uuid:
         type: string
     type: object
@@ -49,12 +67,12 @@ definitions:
       operationType:
         description: DEPOSIT or WITHDRAW
         type: string
-      walletId:
+      walletUUID:
         type: string
     required:
     - amount
     - operationType
-    - walletId
+    - walletUUID
     type: object
 host: localhost:8080
 info:
@@ -63,6 +81,202 @@ info:
   title: Wallet API
   version: "1.0"
 paths:
+  /api/admin/wallet/new:
+    post:
+      consumes:
+      - application/json
+      description: create wallet
+      operationId: create-wallet-admin
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: uuid
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Wallet
+      tags:
+      - ADMIN
+  /api/v1/admin/wallet:
+    post:
+      consumes:
+      - application/json
+      description: update wallet
+      operationId: update-wallet-admin
+      parameters:
+      - description: Wallet query
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.WalletUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Wallet
+      tags:
+      - ADMIN
+  /api/v1/admin/wallet/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: get all wallets by user id
+      operationId: get-all-wallets-admin
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.getAllWalletsAdminResponce'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Wallets By User ID
+      tags:
+      - ADMIN
+  /api/v1/admin/wallet/block:
+    put:
+      consumes:
+      - application/json
+      description: block wallet
+      operationId: block-wallet-admin
+      parameters:
+      - description: Block Wallet
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.BlockWallet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Block Wallet
+      tags:
+      - ADMIN
+  /api/v1/admin/wallets/{wallet_uuid}:
+    get:
+      consumes:
+      - application/json
+      description: get wallet by uuid
+      operationId: get-wallet-by-uuid-admin
+      parameters:
+      - description: Wallet uuid
+        in: path
+        name: wallet_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Wallet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Wallet By UUID
+      tags:
+      - ADMIN
   /api/v1/wallet:
     get:
       consumes:
@@ -215,21 +429,15 @@ paths:
     get:
       consumes:
       - application/json
-      description: get wallet by uuid
-      operationId: get-wallet-by-uuid
-      parameters:
-      - description: Wallet uuid
-        in: path
-        name: wallet_uuid
-        required: true
-        type: string
+      description: get wallet balance
+      operationId: get-wallet-balance
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Wallet'
+            $ref: '#/definitions/handler.getAllWalletsResponce'
         "400":
           description: Bad Request
           schema:
@@ -248,7 +456,7 @@ paths:
             $ref: '#/definitions/handler.errorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get Wallet By UUID
+      summary: Get Wallet Balance
       tags:
       - Wallets
   /auth/sign-in:
