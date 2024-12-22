@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,7 +15,6 @@ import (
 	"github.com/Njrctr/javacode_test_golang_junior/pkg/service"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 // @title Wallet API
@@ -29,21 +29,21 @@ import (
 // @name Authorization
 
 func main() {
-	if err := initConfig(); err != nil {
-		logrus.Fatalf("Ошибка инициализации конфига: %s", err.Error())
+
+	config, err := initConfig()
+	if err != nil {
+		logrus.Fatalf("Ошибка инициализации Конфига: %s", err.Error())
 	}
-	if err := godotenv.Load(); err != nil {
-		logrus.Fatalf("Ошибка получения переменных окружения: %s", err.Error())
-	}
+
+	fmt.Println(config)
+
 	db, err := pg_rep.NewDB(pg_rep.Config{
-		// Host: viper.GetString("db.host"),
-		Host: "localhost",
-		// Port: viper.GetString("db.port"),
-		Port:     "5436",
-		Username: viper.GetString("db.username"),
-		DBName:   viper.GetString("db.dbname"),
-		SSLMode:  viper.GetString("db.sslmode"),
-		Password: os.Getenv("DB_PASSWORD"),
+		Host:     config["DB_HOST"],
+		Port:     config["DB_PORT"],
+		Username: config["DB_USERNAME"],
+		DBName:   config["DB_DBNAME"],
+		SSLMode:  config["DB_SSLMODE"],
+		Password: config["DB_PASSWORD"],
 	})
 	if err != nil {
 		logrus.Fatalf("Ошибка инициализации Базы данных: %s", err.Error())
@@ -52,10 +52,10 @@ func main() {
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 	server := new(models.Server)
-	logrus.Printf("Попытка запуска сервера на порту %s", viper.GetString("port"))
+	logrus.Printf("Попытка запуска сервера на порту %s", config["APP_PORT"])
 
 	go func() {
-		if err := server.Run(viper.GetString("port"), handlers.InitRouters()); err != nil && err != http.ErrServerClosed {
+		if err := server.Run(config["APP_PORT"], handlers.InitRouters()); err != nil && err != http.ErrServerClosed {
 			logrus.Fatalf("Error occured while running http server: %s", err.Error())
 		}
 	}()
@@ -73,8 +73,19 @@ func main() {
 	}
 }
 
-func initConfig() error {
-	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
-	return viper.ReadInConfig()
+func initConfig() (map[string]string, error) {
+	if err := godotenv.Load(); err != nil {
+		logrus.Fatalf("Ошибка получения переменных окружения: %s", err.Error())
+	}
+
+	config := map[string]string{
+		"DB_HOST":     os.Getenv("DB_HOST"),
+		"DB_PORT":     os.Getenv("DB_PORT"),
+		"DB_USERNAME": os.Getenv("DB_USERNAME"),
+		"DB_DBNAME":   os.Getenv("DB_DBNAME"),
+		"DB_SSLMODE":  os.Getenv("DB_SSLMODE"),
+		"DB_PASSWORD": os.Getenv("DB_PASSWORD"),
+		"APP_PORT":    os.Getenv("APP_PORT"),
+	}
+	return config, nil
 }
