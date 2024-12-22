@@ -11,6 +11,7 @@ import (
 const (
 	autorizationHeader = "Authorization"
 	userCtx            = "userId"
+	adminCtx           = "isAdmin"
 )
 
 func (h *Handler) userIdentify(c *gin.Context) {
@@ -36,13 +37,34 @@ func (h *Handler) userIdentify(c *gin.Context) {
 		return
 	}
 
-	userId, err := h.services.ParseToken(headerParts[1])
+	claims, err := h.services.ParseToken(headerParts[1])
 	if err != nil {
 		newErrorResponse(c, http.StatusUnauthorized, err.Error())
 		return
 	}
-
+	userId := claims.UserId
+	isAdmin := claims.IsAdmin
 	c.Set(userCtx, userId)
+	c.Set(adminCtx, isAdmin)
+}
+
+func (h *Handler) adminIdentify(c *gin.Context) {
+	isAdmin, ok := c.Get(adminCtx)
+	if !ok {
+		newErrorResponse(c, http.StatusUnauthorized, "Admin is not found")
+		return
+	}
+
+	isAdminBool, ok := isAdmin.(bool)
+	if !ok {
+		newErrorResponse(c, http.StatusUnauthorized, "Admin is of invalid type")
+		return
+	}
+
+	if !isAdminBool {
+		newErrorResponse(c, http.StatusUnauthorized, "User is not admin")
+		return
+	}
 }
 
 func getUserId(c *gin.Context) (int, error) {

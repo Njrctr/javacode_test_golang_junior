@@ -44,26 +44,26 @@ func (r *WalletPostgres) Create(userId int) (uuid.UUID, error) {
 func (r *WalletPostgres) GetAll(userId int) ([]models.Wallet, error) {
 	var lists []models.Wallet
 
-	query := fmt.Sprintf("SELECT w.uuid, w.balance FROM %s w INNER JOIN %s uw on w.id=uw.wallet_id WHERE uw.user_id=$1", walletsTable, usersWalletsTable)
+	query := fmt.Sprintf("SELECT w.uuid, w.balance, w.blocked FROM %s w INNER JOIN %s uw on w.id=uw.wallet_id WHERE uw.user_id=$1", walletsTable, usersWalletsTable)
 	err := r.db.Select(&lists, query, userId)
 
 	return lists, err
 }
 
-func (r *WalletPostgres) GetByUUID(walletId uuid.UUID) (models.Wallet, error) {
+func (r *WalletPostgres) GetByUUID(walletUUID uuid.UUID) (models.Wallet, error) {
 	var wallet models.Wallet
 
-	query := fmt.Sprintf("SELECT uuid, balance FROM %s WHERE uuid=$1", walletsTable)
-	err := r.db.Get(&wallet, query, walletId)
+	query := fmt.Sprintf("SELECT uuid, balance, blocked FROM %s WHERE uuid=$1", walletsTable)
+	err := r.db.Get(&wallet, query, walletUUID)
 
 	return wallet, err
 }
 
-func (r *WalletPostgres) GetBalanceByUUID(walletId uuid.UUID) (int, error) {
+func (r *WalletPostgres) GetBalanceByUUID(walletUUID uuid.UUID) (int, error) {
 	var wallet models.Wallet
 
 	query := fmt.Sprintf("SELECT uuid, balance FROM %s WHERE uuid=$1", walletsTable)
-	err := r.db.Get(&wallet, query, walletId)
+	err := r.db.Get(&wallet, query, walletUUID)
 
 	return wallet.Balance, err
 }
@@ -75,21 +75,33 @@ func (r *WalletPostgres) Update(input models.WalletUpdate) error {
 		setQuery = fmt.Sprintf("balance=balance+%d", input.Amount)
 	case "WITHDRAW":
 		setQuery = fmt.Sprintf("balance=balance-%d", input.Amount)
-	default:
-		return errors.New("неизвестный тип операции OperationType")
 	}
 
 	query := fmt.Sprintf("UPDATE %s SET %s WHERE uuid=$1", walletsTable, setQuery)
 
 	_, err := r.db.Exec(query, input.WalletUUID)
-	if err.Error() == "pq: new row for relation \"wallets\" violates check constraint \"wallets_balance_check\"" {
+	if err != nil && err.Error() == "pq: new row for relation \"wallets\" violates check constraint \"wallets_balance_check\"" {
 		return errors.New("недостаточно средств на счете")
 	}
 	return err
 }
 
-func (r *WalletPostgres) Delete(walleId uuid.UUID) error {
-	query := fmt.Sprintf("DELETE FROM %s WHERE uuid=$1", walletsTable)
-	_, err := r.db.Exec(query, walleId)
+func (r *WalletPostgres) Delete(userId int, walletUUID uuid.UUID) error {
+	walletIdQuery := fmt.Sprintf("SELECT * FROM %s WHERE uuid=$1", walletsTable)
+	var wallet models.Wallet
+	err := r.db.Get(&wallet, walletIdQuery, walletUUID)
+	if err != nil {
+		return err
+	}
+
+	if wallet.Balance != 0 {
+		return errors.New("невозможно удалить не пустой кошелёк")
+	}
+	if !wallet.Blocked {
+		return errors.New("невозможно удалить заблокированный колешёк. Обратитесь к администрации")
+	}
+
+	query := fmt.Sprintf("DELETE FROM %s w USING %s uw WHERE uw.wallet_id=w.id AND uw.user_id=$1 AND uw.wallet_id=$2", walletsTable, usersWalletsTable)
+	_, err = r.db.Exec(query, userId, wallet.Id)
 	return err
 }

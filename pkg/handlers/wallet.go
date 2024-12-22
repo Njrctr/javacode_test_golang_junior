@@ -70,45 +70,27 @@ func (h *Handler) getAllWallets(c *gin.Context) {
 	})
 }
 
-// @Summary Get Wallet By UUID
+// @Summary Get Wallet Balance
 // @Security ApiKeyAuth
 // @Tags Wallets
-// @Description get wallet by uuid
-// @ID get-wallet-by-uuid
+// @Description get wallet balance
+// @ID get-wallet-balance
 // @Accept  json
 // @Produce  json
-// @Param wallet_uuid path string true "Wallet uuid"
-// @Success 200 {object} models.Wallet
+// @Success 200 {object} getAllWalletsResponce
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /api/v1/wallets/{wallet_uuid} [get]
-func (h *Handler) getWalletById(c *gin.Context) {
-
-	walletId, err := uuid.FromString(c.Param("wallet_uuid"))
-	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "Invalid wallet_uuid param")
-		return
-	}
-
-	wallet, err := h.services.Wallet.GetByUUID(walletId)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, wallet)
-}
-
 func (h *Handler) GetBalanceByUUID(c *gin.Context) {
 
-	walletId, err := uuid.FromString(c.Param("wallet_uuid"))
+	walletUUID, err := uuid.FromString(c.Param("wallet_uuid"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "Invalid wallet_uuid param")
 		return
 	}
 
-	walletBalance, err := h.services.Wallet.GetBalanceByUUID(walletId)
+	walletBalance, err := h.services.Wallet.GetBalanceByUUID(walletUUID)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -116,6 +98,40 @@ func (h *Handler) GetBalanceByUUID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, walletBalance)
 }
+
+// // @Summary Deposit or Withdraw
+// // @Security ApiKeyAuth
+// // @Tags Wallets
+// // @Description update wallet
+// // @ID update-wallet
+// // @Accept  json
+// // @Produce  json
+// // @Param input body models.WalletUpdate true "Wallet query"
+// // @Success 200 {integer} integer 1
+// // @Failure 400,404 {object} errorResponse
+// // @Failure 500 {object} errorResponse
+// // @Failure default {object} errorResponse
+// // @Router /api/v1/wallet [post]
+// func (h *Handler) depositOrWithdraw(c *gin.Context) {
+// 	var input models.WalletUpdate
+// 	if err := c.BindJSON(&input); err != nil {
+// 		newErrorResponse(c, http.StatusBadRequest, err.Error())
+// 		return
+// 	}
+
+// 	if input.OperationType != "DEPOSIT" && input.OperationType != "WITHDRAW" {
+// 		newErrorResponse(c, http.StatusBadRequest, "Неизвестный тип операции OperationType")
+// 		return
+
+// 	}
+
+// 	if err := h.services.Wallet.Update(input); err != nil {
+// 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+// 		return
+// 	}
+
+// 	c.JSON(http.StatusOK, statusResponce{"ok"})
+// }
 
 // @Summary Update Wallet
 // @Security ApiKeyAuth
@@ -132,10 +148,20 @@ func (h *Handler) GetBalanceByUUID(c *gin.Context) {
 // @Router /api/v1/wallet [post]
 func (h *Handler) updateWallet(c *gin.Context) {
 
+	//По идее обычный пользователь не может владеть такой операцией
+	//Но для тестового задания оставлю
+	//Пользователь дожен лишь иметь возможность создать заявку на вывод/пополнение кошелька
+
 	var input models.WalletUpdate
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
+	}
+
+	if input.OperationType != "DEPOSIT" && input.OperationType != "WITHDRAW" {
+		newErrorResponse(c, http.StatusBadRequest, "Неизвестный тип операции OperationType")
+		return
+
 	}
 
 	if err := h.services.Wallet.Update(input); err != nil {
@@ -161,13 +187,18 @@ func (h *Handler) updateWallet(c *gin.Context) {
 // @Router /api/v1/wallet/{wallet_uuid} [delete]
 func (h *Handler) deleteWallet(c *gin.Context) {
 
-	walletId, err := uuid.FromString(c.Param("wallet_uuid"))
+	userId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+
+	walletUUID, err := uuid.FromString(c.Param("wallet_uuid"))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "Invalid wallet_uuid param")
 		return
 	}
 
-	err = h.services.Wallet.Delete(walletId)
+	err = h.services.Wallet.Delete(userId, walletUUID)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

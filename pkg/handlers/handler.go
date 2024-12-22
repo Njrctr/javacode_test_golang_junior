@@ -33,6 +33,7 @@ func (h *Handler) InitRouters() *gin.Engine {
 		{
 			wallet := v1.Group("/wallet")
 			{
+				// wallet.POST("/", h.depositOrWithdraw)
 				wallet.POST("/", h.updateWallet)
 				wallet.POST("/new", h.createWallet)
 				wallet.GET("/", h.getAllWallets)
@@ -42,6 +43,22 @@ func (h *Handler) InitRouters() *gin.Engine {
 			wallets := v1.Group("/wallets")
 			{
 				wallets.GET("/:wallet_uuid", h.GetBalanceByUUID)
+			}
+
+			admin := v1.Group("/admin", h.adminIdentify)
+			{
+				wallet := admin.Group("/wallet")
+				{
+					wallet.POST("/", h.updateWalletAdmin)
+					wallet.POST("/new", h.createWalletToUser)
+					wallet.GET("/:user_id", h.getAllWalletsByUser)
+					wallet.PUT("/block", h.blockWallet)
+				}
+
+				wallets := admin.Group("/wallets")
+				{
+					wallets.GET("/:wallet_uuid", h.getWalletByUUID)
+				}
 			}
 
 		}

@@ -7,6 +7,7 @@ type SignUpInput struct {
 }
 
 type User struct {
-	Id int `json:"-" db:"id"`
+	Id      int  `json:"-" db:"id"`
+	IsAdmin bool `json:"-" db:"is_admin"`
 	SignUpInput
 }

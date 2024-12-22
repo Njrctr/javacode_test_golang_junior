@@ -9,6 +9,7 @@ import (
 	models "github.com/Njrctr/javacode_test_golang_junior/models"
 	"github.com/Njrctr/javacode_test_golang_junior/pkg/repository"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -19,7 +20,8 @@ const (
 
 type tokenClaims struct {
 	jwt.StandardClaims
-	UserId int `json:"user_id"`
+	UserId  int  `json:"user_id"`
+	IsAdmin bool `json:"is_admin"`
 }
 
 type AuthService struct {
@@ -46,12 +48,13 @@ func (s *AuthService) GenerateJWTToken(username, password string) (string, error
 			IssuedAt:  time.Now().Unix(),
 		},
 		user.Id,
+		user.IsAdmin,
 	})
-
+	logrus.Println(user.IsAdmin)
 	return token.SignedString([]byte(signingKey))
 }
 
-func (s *AuthService) ParseToken(accesToken string) (int, error) {
+func (s *AuthService) ParseToken(accesToken string) (*tokenClaims, error) {
 	token, err := jwt.ParseWithClaims(accesToken, &tokenClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
@@ -60,15 +63,15 @@ func (s *AuthService) ParseToken(accesToken string) (int, error) {
 		return []byte(signingKey), nil
 	})
 	if err != nil {
-		return 0, nil
+		return nil, nil
 	}
 
 	claims, ok := token.Claims.(*tokenClaims)
 	if !ok {
-		return 0, errors.New("token claims are not of type *tokenClaims")
+		return nil, errors.New("token claims are not of type *tokenClaims")
 	}
 
-	return claims.UserId, nil
+	return claims, nil
 }
 
 func generatePasswordHash(password string) string {

@@ -11,26 +11,33 @@ import (
 type Autorization interface {
 	CreateUser(user models.User) (int, error)
 	GenerateJWTToken(username, password string) (string, error)
-	ParseToken(token string) (int, error)
+	ParseToken(token string) (*tokenClaims, error)
 }
 
 type Wallet interface {
 	Create(userId int) (uuid.UUID, error)
 	GetAll(userId int) ([]models.Wallet, error)
-	GetByUUID(walletId uuid.UUID) (models.Wallet, error)
-	GetBalanceByUUID(walletId uuid.UUID) (int, error)
+	GetByUUID(walletUUID uuid.UUID) (models.Wallet, error)
+	GetBalanceByUUID(walletUUID uuid.UUID) (int, error)
 	Update(input models.WalletUpdate) error
-	Delete(walletId uuid.UUID) error
+	Delete(userId int, walletUUID uuid.UUID) error //todo: Сделать Удаление возможным только при нулевом балансе
+}
+
+type Admin interface {
+	Update(input models.WalletUpdate) error
+	BlockWallet(input models.BlockWallet) error
 }
 
 type Service struct {
 	Autorization
 	Wallet
+	Admin
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Autorization: NewAuthService(repos.Autorization),
 		Wallet:       NewWalletService(repos.Wallet),
+		Admin:        NewAdminService(repos.Admin),
 	}
 }

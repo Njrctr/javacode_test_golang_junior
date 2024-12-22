@@ -3,14 +3,16 @@ CREATE TABLE users
     id            serial       not null unique,
     email          varchar(255) not null unique,
     username      varchar(255) not null unique,
-    password_hash varchar(255) not null
+    password_hash varchar(255) not null,
+    is_admin bool DEFAULT false not null
 );
 
 CREATE TABLE wallets
 (
     id            serial       not null unique,
-    uuid          uuid      DEFAULT gen_random_uuid(),
-    balance  int   CHECK (balance >= 0) DEFAULT 0
+    uuid          uuid      DEFAULT gen_random_uuid() not null,
+    balance  int   CHECK (balance >= 0) DEFAULT 0,
+    blocked bool DEFAULT false not null
 );
 
 CREATE TABLE users_wallets

@@ -17,18 +17,26 @@ type Wallet interface {
 	GetAll(userId int) ([]models.Wallet, error)
 	GetByUUID(walletId uuid.UUID) (models.Wallet, error)
 	GetBalanceByUUID(walletId uuid.UUID) (int, error)
-	Delete(walletId uuid.UUID) error
 	Update(input models.WalletUpdate) error
+	Delete(userId int, walletId uuid.UUID) error
+}
+
+type Admin interface {
+	GetByUUID(walletId uuid.UUID) (models.Wallet, error)
+	Update(input models.WalletUpdate) error
+	BlockWallet(input models.BlockWallet) error
 }
 
 type Repository struct {
 	Autorization
 	Wallet
+	Admin
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Autorization: pg_rep.NewAuthPostgres(db),
 		Wallet:       pg_rep.NewWalletPostgres(db),
+		Admin:        pg_rep.NewAdminPostgres(db),
 	}
 }
