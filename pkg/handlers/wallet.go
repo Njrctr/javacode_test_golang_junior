@@ -77,6 +77,7 @@ func (h *Handler) getAllWallets(c *gin.Context) {
 // @ID get-wallet-balance
 // @Accept  json
 // @Produce  json
+// @Param wallet_uuid path string true "Wallet UUID"
 // @Success 200 {object} getAllWalletsResponce
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
@@ -95,8 +96,9 @@ func (h *Handler) GetBalanceByUUID(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	c.JSON(http.StatusOK, walletBalance)
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"balance": walletBalance,
+	})
 }
 
 // // @Summary Deposit or Withdraw

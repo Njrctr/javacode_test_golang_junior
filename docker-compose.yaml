@@ -3,7 +3,7 @@ version: '3.8'
 services:
     walletter-backend:
         build: ./
-        command: ./wait-for-postgres.sh database ./javacode_test_golang_junior -mode release
+        command: ./wait-for-postgres.sh database ./walletter-backend -mode release
         ports:
             - 8080:8080
         depends_on:
@@ -15,8 +15,8 @@ services:
     database:
         restart: unless-stopped
         image: postgres:latest
-        # volumes:
-        # - ./.database/postgres/data:/var/lib/postgresql/data
+        volumes:
+        - ./.database/postgres/data:/var/lib/postgresql/data
         environment:
             - POSTGRES_PASSWORD=qwerty
         ports:

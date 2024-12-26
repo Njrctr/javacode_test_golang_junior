@@ -10,6 +10,10 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+type CreateWallet struct {
+	UserId int `json:"user_id" binding:"required"`
+}
+
 // @Summary Create Wallet
 // @Security ApiKeyAuth
 // @Tags ADMIN
@@ -17,21 +21,21 @@ import (
 // @ID create-wallet-admin
 // @Accept  json
 // @Produce  json
+// @Param input body CreateWallet true "User ID"
 // @Success 200 {uuid} uuid 1
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/admin/wallet/new [post]
+// @Router /api/v1/admin/wallet/new [post]
 func (h *Handler) createWalletToUser(c *gin.Context) {
-	// TODO: jwt токен должен передавать поле is_admin
 
-	var userId int
+	var userId CreateWallet
 	if err := c.BindJSON(&userId); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	uuid, err := h.services.Wallet.Create(userId)
+	uuid, err := h.services.Wallet.Create(userId.UserId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

@@ -17,4 +17,4 @@ swag:
 	swag init -g cmd/main.go
 
 database:
-	sudo docker run --name=todo-db -e POSTGRES_PASSWORD='qwerty' -p 5436:5432 -d --rm postgres
+	sudo docker run --name=walletter-db -e POSTGRES_PASSWORD='qwerty' -p 5436:5432 -d --rm postgres

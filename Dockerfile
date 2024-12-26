@@ -18,6 +18,6 @@ RUN chmod +x wait-for-postgres.sh
 
 
 RUN go mod download
-RUN go build -o restapi-walletter ./cmd/main.go
+RUN go build -o walletter-backend ./cmd/main.go
 
-CMD [ "./restapi-todo" ]
+CMD [ "./walletter-backend" ]

@@ -9,7 +9,6 @@ import (
 	models "github.com/Njrctr/javacode_test_golang_junior/models"
 	"github.com/Njrctr/javacode_test_golang_junior/pkg/repository"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -50,7 +49,6 @@ func (s *AuthService) GenerateJWTToken(username, password string) (string, error
 		user.Id,
 		user.IsAdmin,
 	})
-	logrus.Infoln(signingKey)
 	return token.SignedString([]byte(signingKey))
 }
 
