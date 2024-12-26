@@ -32,7 +32,7 @@ func NewAuthService(repo repository.Autorization) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) CreateUser(user models.User) (int, error) {
+func (s *AuthService) CreateUser(user models.SignUpInput) (int, error) {
 	user.Password = generatePasswordHash(user.Password)
 	return s.repo.CreateUser(user)
 }
@@ -50,11 +50,11 @@ func (s *AuthService) GenerateJWTToken(username, password string) (string, error
 		user.Id,
 		user.IsAdmin,
 	})
-	logrus.Println(user.IsAdmin)
+	logrus.Infoln(signingKey)
 	return token.SignedString([]byte(signingKey))
 }
 
-func (s *AuthService) ParseToken(accesToken string) (*tokenClaims, error) {
+func (s *AuthService) ParseToken(accesToken string) (int, bool, error) {
 	token, err := jwt.ParseWithClaims(accesToken, &tokenClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
@@ -63,15 +63,15 @@ func (s *AuthService) ParseToken(accesToken string) (*tokenClaims, error) {
 		return []byte(signingKey), nil
 	})
 	if err != nil {
-		return nil, nil
+		return 0, false, err
 	}
 
 	claims, ok := token.Claims.(*tokenClaims)
 	if !ok {
-		return nil, errors.New("token claims are not of type *tokenClaims")
+		return 0, false, errors.New("token claims are not of type *tokenClaims")
 	}
 
-	return claims, nil
+	return claims.UserId, claims.IsAdmin, nil
 }
 
 func generatePasswordHash(password string) string {

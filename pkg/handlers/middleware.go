@@ -37,13 +37,12 @@ func (h *Handler) userIdentify(c *gin.Context) {
 		return
 	}
 
-	claims, err := h.services.ParseToken(headerParts[1])
+	userId, isAdmin, err := h.services.ParseToken(headerParts[1])
 	if err != nil {
 		newErrorResponse(c, http.StatusUnauthorized, err.Error())
 		return
 	}
-	userId := claims.UserId
-	isAdmin := claims.IsAdmin
+
 	c.Set(userCtx, userId)
 	c.Set(adminCtx, isAdmin)
 }

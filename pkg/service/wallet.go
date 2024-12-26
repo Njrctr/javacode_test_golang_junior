@@ -35,8 +35,8 @@ func (s *WalletService) Delete(userId int, walletUUID uuid.UUID) error {
 }
 
 func (s *WalletService) Update(input models.WalletUpdate) error {
-	// if err := input.Validate(); err != nil {
-	// 	return err
-	// }
+	if err := (&input).Validate(); err != nil {
+		return err
+	}
 	return s.repo.Update(input)
 }

@@ -70,16 +70,15 @@ func (r *WalletPostgres) GetBalanceByUUID(walletUUID uuid.UUID) (int, error) {
 
 func (r *WalletPostgres) Update(input models.WalletUpdate) error {
 	var setQuery string
-	switch input.OperationType {
-	case "DEPOSIT":
-		setQuery = fmt.Sprintf("balance=balance+%d", input.Amount)
-	case "WITHDRAW":
+	setQuery = fmt.Sprintf("balance=balance+%d", input.Amount)
+
+	if input.OperationType == "WITHDRAW" {
 		setQuery = fmt.Sprintf("balance=balance-%d", input.Amount)
 	}
 
-	query := fmt.Sprintf("UPDATE %s SET %s WHERE uuid=$1", walletsTable, setQuery)
+	query := fmt.Sprintf("UPDATE %s SET $1 WHERE uuid=$2", walletsTable)
 
-	_, err := r.db.Exec(query, input.WalletUUID)
+	_, err := r.db.Exec(query, setQuery, input.WalletUUID)
 	if err != nil && err.Error() == "pq: new row for relation \"wallets\" violates check constraint \"wallets_balance_check\"" {
 		return errors.New("недостаточно средств на счете")
 	}
@@ -97,7 +96,7 @@ func (r *WalletPostgres) Delete(userId int, walletUUID uuid.UUID) error {
 	if wallet.Balance != 0 {
 		return errors.New("невозможно удалить не пустой кошелёк")
 	}
-	if !wallet.Blocked {
+	if wallet.Blocked {
 		return errors.New("невозможно удалить заблокированный колешёк. Обратитесь к администрации")
 	}
 

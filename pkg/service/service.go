@@ -9,9 +9,9 @@ import (
 //go:generate mockgen -source=service.go -destination=mock/mock.go
 
 type Autorization interface {
-	CreateUser(user models.User) (int, error)
+	CreateUser(user models.SignUpInput) (int, error)
 	GenerateJWTToken(username, password string) (string, error)
-	ParseToken(token string) (*tokenClaims, error)
+	ParseToken(token string) (int, bool, error)
 }
 
 type Wallet interface {

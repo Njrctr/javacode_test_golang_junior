@@ -8,8 +8,8 @@ import (
 )
 
 type Autorization interface {
-	CreateUser(user models.User) (int, error)
-	GetUser(email, password string) (models.User, error)
+	CreateUser(user models.SignUpInput) (int, error)
+	GetUser(username, password string) (models.User, error)
 }
 
 type Wallet interface {
