@@ -1,13 +1,12 @@
-CREATE TABLE users
+CREATE TABLE IF NOT EXISTS users
 (
     id            serial       not null unique,
-    email          varchar(255) not null unique,
     username      varchar(255) not null unique,
     password_hash varchar(255) not null,
     is_admin bool DEFAULT false not null
 );
 
-CREATE TABLE wallets
+CREATE TABLE IF NOT EXISTS wallets
 (
     id            serial       not null unique,
     uuid          uuid      DEFAULT gen_random_uuid() not null,
@@ -15,7 +14,7 @@ CREATE TABLE wallets
     blocked bool DEFAULT false not null
 );
 
-CREATE TABLE users_wallets
+CREATE TABLE IF NOT EXISTS users_wallets
 (
     id      serial                                           not null unique,
     user_id int references users (id) on delete cascade      not null,
