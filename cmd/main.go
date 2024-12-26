@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"flag"
 	"net/http"
 	"os"
 	"os/signal"
@@ -34,8 +34,6 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("Ошибка инициализации Конфига: %s", err.Error())
 	}
-
-	fmt.Println(config)
 
 	db, err := pg_rep.NewDB(pg_rep.Config{
 		Host:     config["DB_HOST"],
@@ -74,7 +72,18 @@ func main() {
 }
 
 func initConfig() (map[string]string, error) {
-	if err := godotenv.Load("config.env"); err != nil {
+
+	mode := flag.String("mode", "debug", "")
+	flag.Parse()
+	confFile := "config_dev.env"
+	if *mode != "debug" && *mode != "release" {
+		logrus.Fatalf("Неверный режим запуска: %s", *mode)
+	}
+	if *mode == "release" {
+		confFile = "config_docker.env"
+	}
+
+	if err := godotenv.Load(confFile); err != nil {
 		logrus.Fatalf("Ошибка получения переменных окружения: %s", err.Error())
 	}
 
