@@ -1,6 +1,11 @@
 package models
 
-import "github.com/gofrs/uuid"
+import (
+	"errors"
+	"math"
+
+	"github.com/gofrs/uuid"
+)
 
 type Wallet struct {
 	Id      int       `json:"-" db:"id"`
@@ -18,4 +23,14 @@ type WalletUpdate struct {
 type BlockWallet struct {
 	WalletUUID uuid.UUID `json:"walletUUID" binding:"required"`
 	Block      *bool     `json:"block" binding:"required"`
+}
+
+func (i *WalletUpdate) Validate() error {
+	if i.OperationType != "DEPOSIT" && i.OperationType != "WITHDRAW" {
+		return errors.New("неизвестный тип операции")
+	}
+	if i.Amount < 0 {
+		i.Amount = int(math.Abs(float64(i.Amount)))
+	}
+	return nil
 }
