@@ -9,6 +9,11 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+const (
+	errorIncorrectUserId = "pq: insert or update on table \"users_wallets\" violates foreign key constraint \"users_wallets_user_id_fkey\""
+	errorBalance         = "pq: new row for relation \"wallets\" violates check constraint \"wallets_balance_check\""
+)
+
 type WalletPostgres struct {
 	db *sqlx.DB
 }
@@ -35,7 +40,7 @@ func (r *WalletPostgres) Create(userId int) (uuid.UUID, error) {
 	_, err = tr.Exec(createUsersWalletQuery, userId, walletId)
 	if err != nil {
 		tr.Rollback()
-		if err.Error() == "pq: insert or update on table \"users_wallets\" violates foreign key constraint \"users_wallets_user_id_fkey\"" {
+		if err.Error() == errorIncorrectUserId {
 			return uuid.Nil, errors.New("недопустимое значение поля user_id")
 		}
 		return uuid.Nil, err
@@ -82,7 +87,7 @@ func (r *WalletPostgres) Update(input models.WalletUpdate) error {
 	query := fmt.Sprintf("UPDATE %s SET %s WHERE uuid=$1", walletsTable, setQuery)
 
 	_, err := r.db.Exec(query, input.WalletUUID)
-	if err != nil && err.Error() == "pq: new row for relation \"wallets\" violates check constraint \"wallets_balance_check\"" {
+	if err != nil && err.Error() == errorBalance {
 		return errors.New("недостаточно средств на счете")
 	}
 	return err
