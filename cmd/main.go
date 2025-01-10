@@ -36,12 +36,12 @@ func main() {
 	}
 
 	db, err := pg_rep.NewDB(pg_rep.Config{
-		Host:     config["DB_HOST"],
-		Port:     config["DB_PORT"],
-		Username: config["DB_USERNAME"],
-		DBName:   config["DB_DBNAME"],
-		SSLMode:  config["DB_SSLMODE"],
-		Password: config["DB_PASSWORD"],
+		Host:     config.DB.Host,
+		Port:     config.DB.Port,
+		Username: config.DB.Username,
+		DBName:   config.DB.Name,
+		SSLMode:  config.DB.SSLMode,
+		Password: config.DB.Password,
 	})
 	if err != nil {
 		logrus.Fatalf("Ошибка инициализации Базы данных: %s", err.Error())
@@ -50,10 +50,10 @@ func main() {
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 	server := new(models.Server)
-	logrus.Printf("Попытка запуска сервера на порту %s", config["APP_PORT"])
+	logrus.Printf("Попытка запуска сервера на порту %s", config.App.Port)
 
 	go func() {
-		if err := server.Run(config["APP_PORT"], handlers.InitRouters()); err != nil && err != http.ErrServerClosed {
+		if err := server.Run(config.App.Port, handlers.InitRouters()); err != nil && err != http.ErrServerClosed {
 			logrus.Fatalf("Error occured while running http server: %s", err.Error())
 		}
 	}()
@@ -71,7 +71,7 @@ func main() {
 	}
 }
 
-func initConfig() (map[string]string, error) {
+func initConfig() (models.Config, error) {
 
 	mode := flag.String("mode", "debug", "")
 	flag.Parse()
@@ -87,14 +87,25 @@ func initConfig() (map[string]string, error) {
 		logrus.Fatalf("Ошибка получения переменных окружения: %s", err.Error())
 	}
 
-	config := map[string]string{
-		"DB_HOST":     os.Getenv("DB_HOST"),
-		"DB_PORT":     os.Getenv("DB_PORT"),
-		"DB_USERNAME": os.Getenv("DB_USERNAME"),
-		"DB_DBNAME":   os.Getenv("DB_DBNAME"),
-		"DB_SSLMODE":  os.Getenv("DB_SSLMODE"),
-		"DB_PASSWORD": os.Getenv("DB_PASSWORD"),
-		"APP_PORT":    os.Getenv("APP_PORT"),
+	// config := map[string]string{
+	// 	"DB_HOST":     os.Getenv("DB_HOST"),
+	// 	"DB_PORT":     os.Getenv("DB_PORT"),
+	// 	"DB_USERNAME": os.Getenv("DB_USERNAME"),
+	// 	"DB_DBNAME":   os.Getenv("DB_DBNAME"),
+	// 	"DB_SSLMODE":  os.Getenv("DB_SSLMODE"),
+	// 	"DB_PASSWORD": os.Getenv("DB_PASSWORD"),
+	// 	"APP_PORT":    os.Getenv("APP_PORT"),
+	// }
+	config := models.Config{
+		App: models.ConfigApp{Port: os.Getenv("APP_PORT")},
+		DB: models.ConfigDB{
+			Host:     os.Getenv("DB_HOST"),
+			Port:     os.Getenv("DB_PORT"),
+			Name:     os.Getenv("DB_DBNAME"),
+			Username: os.Getenv("DB_USERNAME"),
+			SSLMode:  os.Getenv("DB_SSLMODE"),
+			Password: os.Getenv("DB_PASSWORD"),
+		},
 	}
 	return config, nil
 }
